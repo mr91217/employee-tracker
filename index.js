@@ -3,6 +3,8 @@ const consoleTable = require('console.table')
 
 const db = require('./db/connection');
 
+const chalk = require('chalk');
+const figlet = require('figlet');
 
 
 
@@ -475,6 +477,14 @@ function exitApp() {
 
 db.connect(err => {
     if (err) throw err;
-    console.log('Database connected.');
+//======================================== Reference ========================================//
+console.log(chalk.red.bold(`====================================================================================`));
+    console.log(``);
+    console.log(chalk.blue.bold(figlet.textSync('Employee Tracker')));
+    console.log(``);
+    console.log(`                                                          ` + chalk.bold('Created By: ChunYu Chang'));
+    console.log(``);
+    console.log(chalk.red.bold(`====================================================================================`));
+//======================================== Reference ========================================//  
     mainmenu();
 });
