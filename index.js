@@ -209,7 +209,7 @@ function addEmployee() {
                         if (res[a].title == answer.role) {
                             role_id = res[a].id;
                             console.log(role_id)
-                        }                
+                        }                  
                     }
                     let dp_id;
                     if (role_id === 4 || role_id === 5) {
