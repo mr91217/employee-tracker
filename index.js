@@ -19,7 +19,9 @@ function mainmenu() {
                     'Add Employee',
                     'Remove Employee',
                     'Update Employee Role',
-                    'Update Employee Manager',
+                    // 'Update Employee Manager',
+                    'View All Departments',
+                    'Add Department',
                     'View All Roles',
                     'Add Role',
                     'Remove Role',
@@ -46,16 +48,19 @@ function mainmenu() {
                         updateRole();
                         break;
                     case 'View All Departments':
-                        viewDepartments();
+                        viewDP();
                         break;
-                    case 'View All roles':
+                    case 'View All Roles':
                         viewRoles();
                         break;
-                    case 'Add a department':
-                        addDepartment();
+                    case 'Add Department':
+                        addnewDP();
                         break;
-                    case 'Add a role':
-                        addRole();
+                    case 'Add Role':
+                        addnewRole();
+                        break;
+                    case 'Remove Role':
+                        removeRole();
                         break;
                     case 'EXIT': 
                         exitApp();
@@ -66,7 +71,6 @@ function mainmenu() {
         })
 };
 
-// view all employees in the database
 function employeeList() {
     var query = 'SELECT * FROM employee';
     db.query(query, function(err, res) {
@@ -135,14 +139,11 @@ function employeeListBD() {
 
                 }
             })
-        // console.log(res.length + ' employees found!');
-        // console.table('All Employees:', res); 
-        // mainmenu();
-//     })
+       
 };
-
+// SELECT employee.first_name, employee.last_name, department.name AS Department FROM employee JOIN role ON employee.role_id = role.id JOIN department ON role.department_id = department.id ORDER BY employee.id;"
 function employeeListBM() {
-  db.query("SELECT employee.first_name, employee.last_name, department.name AS Department FROM employee JOIN role ON employee.role_id = role.id JOIN department ON role.department_id = department.id ORDER BY employee.id;", 
+  db.query("SELECT first_name, last_name, manager_id FROM employee", 
   function(err, res) {
     if (err) throw err
     console.table(res)
@@ -150,27 +151,24 @@ function employeeListBM() {
   })
 }
 
-// view all departments in the database
-function viewDepartments() {
-    var query = 'SELECT * FROM department';
-    db.query(query, function(err, res) {
+function viewDP() {
+    var sql = 'SELECT * FROM department';
+    db.query(sql, function(err, res) {
         if(err)throw err;
         console.table('All Departments:', res);
         mainmenu();
     })
 };
 
-// view all roles in the database
 function viewRoles() {
-    var query = 'SELECT * FROM role';
-    db.query(query, function(err, res){
+    var sql = 'SELECT * FROM role';
+    db.query(sql, function(err, res){
         if (err) throw err;
         console.table('All Roles:', res);
         mainmenu();
     })
 };
 
-// add an employee to the database
 function addEmployee() {
     db.query('SELECT * FROM role', function (err, res) {
         if (err) throw err;
@@ -244,47 +242,45 @@ function addEmployee() {
 
 
 
-// add a department to the database
-function addDepartment() {
+function addnewDP() {
     inquirer
         .prompt([
             {
-                name: 'newDepartment', 
+                name: 'newDP', 
                 type: 'input', 
-                message: 'Which department would you like to add?'
+                message: 'What department will be added?'
             }
             ]).then(function (answer) {
                 db.query(
                     'INSERT INTO department SET ?',
                     {
-                        name: answer.newDepartment
+                        name: answer.newDP
                     });
-                var query = 'SELECT * FROM department';
-                db.query(query, function(err, res) {
+                var sql = 'SELECT * FROM department';
+                db.query(sql, function(err, res) {
                 if(err)throw err;
-                console.log('Your department has been added!');
+                console.log('The new department has been added!');
                 console.table('All Departments:', res);
                 mainmenu();
                 })
             })
 };
 
-// add a role to the database
-function addRole() {
+function addnewRole() {
     db.query('SELECT * FROM department', function(err, res) {
         if (err) throw err;
     
         inquirer 
         .prompt([
             {
-                name: 'new_role',
+                name: 'newrole',
                 type: 'input', 
-                message: "What new role would you like to add?"
+                message: "What new role would be added?"
             },
             {
                 name: 'salary',
                 type: 'input',
-                message: 'What is the salary of this role? (Enter a number)'
+                message: 'What is the salary? (number only)'
             },
             {
                 name: 'Department',
@@ -308,91 +304,101 @@ function addRole() {
             db.query(
                 'INSERT INTO role SET ?',
                 {
-                    title: answer.new_role,
+                    title: answer.newrole,
                     salary: answer.salary,
                     department_id: department_id
                 },
                 function (err, res) {
                     if(err)throw err;
                     console.log('Your new role has been added!');
-                    console.table('All Roles:', res);
+                    // console.table('All Roles:', res);
+                    
                     mainmenu();
                 })
         })
     })
 };
 
-// update a role in the database
-function updateRole() {
 
-};
 
-//  delete an employee
-// function removeEmployee() {
-//     inquirer
-//             .prompt({
-//                 name:'employee',
-//                 type:'list',
-//                 message: 'which employee?',
-//                 choices: [
-//                     'TofuLu',
-//                     'Engineering',
-//                     'Finance',
-//                     'Legal'
-//                 ]
-//             }).then(function(answer){
-//                 switch (answer.employee){
-//                     case 'TofuLu':
-//                         var sql = 'DELETE FROM employee WHERE id = 9';
-//                         db.query(sql, function(err, res) {
-//                             if (err) throw err;
-//                             console.log(res);
-//                             console.table('All Employees:', res); 
-//                             mainmenu();
-//                         })
-//                         break;
-//                     case 'Engineering':
-//                         var sql = 'SELECT first_name, last_name, department_id FROM employee WHERE department_id = 2';
-//                         db.query(sql, function(err, res) {
-//                             if (err) throw err;
-//                             console.log(res.length + ' employees found!');
-//                             console.table('All Employees:', res); 
-//                             mainmenu();
-//                         })
-//                         break;
-//                     case 'Finance':
-//                         var sql = 'SELECT first_name, last_name, department_id FROM employee WHERE department_id = 3';
-//                         db.query(sql, function(err, res) {
-//                             if (err) throw err;
-//                             console.log(res.length + ' employees found!');
-//                             console.table('All Employees:', res); 
-//                             mainmenu();
-//                         })
-//                         break;
-//                     case 'Legal':
-//                         var sql = 'SELECT first_name, last_name, department_id FROM employee WHERE department_id = 4';
-//                         db.query(sql, function(err, res) {
-//                             if (err) throw err;
-//                             console.log(res.length + ' employees found!');
-//                             console.table('All Employees:', res); 
-//                             mainmenu();
-//                         })
-//                         break;
-//                     default:
-//                         break;
 
-//                 }
-//             })
 
-// };
-
-const removeEmployee = () => {
-    let sql =     `SELECT employee.id, employee.first_name, employee.last_name FROM employee`;
-
+//======================================== Reference ========================================//
+// Update an Employee's Role
+const updateRole = () => {
+    let sql =       `SELECT employee.id, employee.first_name, employee.last_name, role.id AS "role_id"
+                    FROM employee, role, department WHERE department.id = role.department_id AND role.id = employee.role_id`;
     db.query(sql, (error, response) => {
       if (error) throw error;
       let employeeNamesArray = [];
       response.forEach((employee) => {employeeNamesArray.push(`${employee.first_name} ${employee.last_name}`);});
+
+      let sql =     `SELECT role.id, role.title FROM role`;
+      db.query(sql, (error, response) => {
+        if (error) throw error;
+        let rolesArray = [];
+        response.forEach((role) => {rolesArray.push(role.title);});
+
+        inquirer
+          .prompt([
+            {
+              name: 'chosenEmployee',
+              type: 'list',
+              message: 'Which employee has a new role?',
+              choices: employeeNamesArray
+            },
+            {
+              name: 'chosenRole',
+              type: 'list',
+              message: 'What is their new role?',
+              choices: rolesArray
+            }
+          ])
+          .then((answer) => {
+            let newTitleId, employeeId;
+
+            response.forEach((role) => {
+              if (answer.chosenRole === role.title) {
+                newTitleId = role.id;
+              }
+            });
+
+            response.forEach((employee) => {
+              if (
+                answer.chosenEmployee ===
+                `${employee.first_name} ${employee.last_name}`
+              ) {
+                employeeId = employee.id;
+              }
+            });
+
+            var sqls =    'UPDATE employee SET employee.role_id = ? WHERE employee.id = ?';
+            db.query(
+              sqls,
+              [newTitleId,employeeId],
+              (error) => {
+                if (error) throw error;
+                console.log(`Employee Role Updated`);
+                mainmenu();
+              }
+            );
+          });
+      });
+    });
+};
+//======================================== Reference ========================================//
+
+
+
+
+//======================================== Reference ========================================//
+function removeEmployee() {
+    let sql =     `SELECT employee.id, employee.first_name, employee.last_name FROM employee`;
+
+    db.query(sql, (err, res) => {
+      if (err) throw err;
+      let employeeNamesArray = [];
+      res.forEach((employee) => {employeeNamesArray.push(`${employee.first_name} ${employee.last_name}`);});
 
       inquirer
         .prompt([
@@ -406,7 +412,7 @@ const removeEmployee = () => {
         .then((answer) => {
           let employeeId;
 
-          response.forEach((employee) => {
+          res.forEach((employee) => {
             if (
               answer.chosenEmployee ===
               `${employee.first_name} ${employee.last_name}`
@@ -416,16 +422,53 @@ const removeEmployee = () => {
           });
 
           let sql = `DELETE FROM employee WHERE employee.id = ?`;
-          db.query(sql, [employeeId], (error) => {
-            if (error) throw error;
+          db.query(sql, [employeeId], (err) => {
+            if (err) throw err;
             console.log(`Employee Successfully Removed`);
             employeeList();
           });
         });
     });
-  };
+};
+//======================================== Reference ========================================//
 
-// exit the app
+
+function removeRole() {
+    let sql = `SELECT role.id, role.title FROM role`;
+
+    db.query(sql, (error, response) => {
+      if (error) throw error;
+      let roleNamesArray = [];
+      response.forEach((role) => {roleNamesArray.push(role.title);});
+
+      inquirer
+        .prompt([
+          {
+            name: 'chosenRole',
+            type: 'list',
+            message: 'Which role would you like to remove?',
+            choices: roleNamesArray
+          }
+        ])
+        .then((answer) => {
+          let roleId;
+
+          response.forEach((role) => {
+            if (answer.chosenRole === role.title) {
+              roleId = role.id;
+            }
+          });
+
+          let sql =   `DELETE FROM role WHERE role.id = ?`;
+          db.query(sql, [roleId], (error) => {
+            if (error) throw error;
+            console.log(`Role Successfully Removed`);
+            viewRoles();
+          });
+        });
+    });
+};
+
 function exitApp() {
     db.end();
 };
